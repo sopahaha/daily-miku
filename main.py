@@ -24,12 +24,12 @@ receiver_email = "vitorcesarino1@gmail.com"
 miku_password = os.getenv('EMAIL_PASSWORD')
 
 
-html = """\
+html = f"""\
 <html>
   <body>
-    <p>Hi, {name}<br>
-      {text}</p>
-    <img src="{image}"></img>
+    <p>Hi, {{name}}<br>
+      {messages_json["daily_messages"][day_index]}</p>
+    <img src="{messages_json["daily_images"][day_index]}"></img>
   </body>
 </html>
 """
@@ -51,19 +51,14 @@ try:
                 message = MIMEMultipart("alternative")
                 message["Subject"] = "Daily miku for you"
                 message["From"] = miku_email
-                formatedHtml = html.format(
-                    name=name,
-                    text=messages_json["daily_messages"][day_index],
-                    image=messages_json["daily_images"][day_index])
+                formatedHtml = html.format(name=name)
                 convertedHtml = MIMEText(formatedHtml, "html")
-                message.attach(formatedHtml)
+                message.attach(convertedHtml)
 
-                print(formatedHtml)
-
-                # server.sendmail(miku_email, email,
-                #                 message.as_string())
-                # sleep(4)
+                server.sendmail(miku_email, email,
+                                message.as_string())
                 print(f"Sent to {name}")
+                sleep(4)
         print("Sent")
         messages_json["day_index"] += 1
         with open(MESSAGES_FILE, "w") as f:
